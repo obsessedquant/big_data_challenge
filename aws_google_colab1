@@ -1,0 +1,324 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "name": "Untitled4.ipynb",
+      "provenance": [],
+      "authorship_tag": "ABX9TyOFpXKsvvsoh+qOuqmOTDpw",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/obsessedquant/big_data_challenge/blob/main/aws_google_colab1\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "bjv8uRlwKV4n",
+        "outputId": "3077a95e-54a8-480e-86d7-fc4b607431d5"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\r0% [Working]\r            \rGet:1 https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/ InRelease [3,626 B]\n",
+            "\r0% [Connecting to archive.ubuntu.com (91.189.88.142)] [Connecting to security.u\r0% [Connecting to archive.ubuntu.com (91.189.88.142)] [Connecting to security.u\r0% [1 InRelease gpgv 3,626 B] [Connecting to archive.ubuntu.com (91.189.88.142)\r                                                                               \rIgn:2 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64  InRelease\n",
+            "\r0% [1 InRelease gpgv 3,626 B] [Waiting for headers] [Waiting for headers] [Wait\r                                                                               \rGet:3 http://ppa.launchpad.net/c2d4u.team/c2d4u4.0+/ubuntu bionic InRelease [15.9 kB]\n",
+            "Get:4 http://security.ubuntu.com/ubuntu bionic-security InRelease [88.7 kB]\n",
+            "Hit:5 http://archive.ubuntu.com/ubuntu bionic InRelease\n",
+            "Ign:6 https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64  InRelease\n",
+            "Hit:7 https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64  Release\n",
+            "Hit:8 https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64  Release\n",
+            "Get:9 http://archive.ubuntu.com/ubuntu bionic-updates InRelease [88.7 kB]\n",
+            "Hit:10 http://ppa.launchpad.net/cran/libgit2/ubuntu bionic InRelease\n",
+            "Hit:11 http://archive.ubuntu.com/ubuntu bionic-backports InRelease\n",
+            "Get:12 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu bionic InRelease [15.9 kB]\n",
+            "Get:13 http://ppa.launchpad.net/graphics-drivers/ppa/ubuntu bionic InRelease [21.3 kB]\n",
+            "Get:15 http://ppa.launchpad.net/c2d4u.team/c2d4u4.0+/ubuntu bionic/main Sources [1,822 kB]\n",
+            "Get:17 http://security.ubuntu.com/ubuntu bionic-security/main amd64 Packages [2,489 kB]\n",
+            "Get:18 http://ppa.launchpad.net/c2d4u.team/c2d4u4.0+/ubuntu bionic/main amd64 Packages [934 kB]\n",
+            "Get:19 http://security.ubuntu.com/ubuntu bionic-security/multiverse amd64 Packages [26.8 kB]\n",
+            "Get:20 http://security.ubuntu.com/ubuntu bionic-security/universe amd64 Packages [1,459 kB]\n",
+            "Get:21 http://archive.ubuntu.com/ubuntu bionic-updates/universe amd64 Packages [2,238 kB]\n",
+            "Get:22 http://security.ubuntu.com/ubuntu bionic-security/restricted amd64 Packages [716 kB]\n",
+            "Get:23 http://archive.ubuntu.com/ubuntu bionic-updates/multiverse amd64 Packages [34.5 kB]\n",
+            "Get:24 http://archive.ubuntu.com/ubuntu bionic-updates/main amd64 Packages [2,929 kB]\n",
+            "Get:25 http://archive.ubuntu.com/ubuntu bionic-updates/restricted amd64 Packages [749 kB]\n",
+            "Get:26 http://ppa.launchpad.net/deadsnakes/ppa/ubuntu bionic/main amd64 Packages [45.3 kB]\n",
+            "Get:27 http://ppa.launchpad.net/graphics-drivers/ppa/ubuntu bionic/main amd64 Packages [44.7 kB]\n",
+            "Fetched 13.7 MB in 3s (4,292 kB/s)\n",
+            "Reading package lists... Done\n"
+          ]
+        }
+      ],
+      "source": [
+        "import os\n",
+        "# Find the latest version of spark 3.0  from http://www.apache.org/dist/spark/ and enter as the spark version\n",
+        "# For example:\n",
+        "# spark_version = 'spark-3.0.3'\n",
+        "# spark_version = 'spark-3.<enter version>'\n",
+        "spark_version = 'spark-3.2.0'\n",
+        "os.environ['SPARK_VERSION']=spark_version\n",
+        "\n",
+        "# Install Spark and Java\n",
+        "!apt-get update\n",
+        "!apt-get install openjdk-8-jdk-headless -qq > /dev/null\n",
+        "!wget -q http://www.apache.org/dist/spark/$SPARK_VERSION/$SPARK_VERSION-bin-hadoop2.7.tgz\n",
+        "!tar xf $SPARK_VERSION-bin-hadoop2.7.tgz\n",
+        "!pip install -q findspark\n",
+        "\n",
+        "# Set Environment Variables\n",
+        "os.environ[\"JAVA_HOME\"] = \"/usr/lib/jvm/java-8-openjdk-amd64\"\n",
+        "os.environ[\"SPARK_HOME\"] = f\"/content/{spark_version}-bin-hadoop2.7\"\n",
+        "\n",
+        "# Start a SparkSession\n",
+        "import findspark\n",
+        "findspark.init()"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Start Spark session\n",
+        "from pyspark.sql import SparkSession\n",
+        "spark = SparkSession.builder.appName(\"DataFrameBasics\").getOrCreate()"
+      ],
+      "metadata": {
+        "id": "-pWsAaLDLo4f"
+      },
+      "execution_count": 3,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Read in data from S3 Buckets\n",
+        "from pyspark import SparkFiles\n",
+        "url = \"https://s3.amazonaws.com/amazon-reviews-pds/tsv/amazon_reviews_us_Wireless_v1_00.tsv.gz\"\n",
+        "spark.sparkContext.addFile(url)\n",
+        "df = spark.read.csv(SparkFiles.get(\"amazon_reviews_us_Wireless_v1_00.tsv.gz\"), sep=\"\\t\", header=True)\n",
+        "\n",
+        "# Show DataFrame\n",
+        "df.show()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "i8ygXG4xK0u1",
+        "outputId": "6ec83ad5-354a-4814-dea2-ff35fd66ff29"
+      },
+      "execution_count": 5,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "+-----------+-----------+--------------+----------+--------------+--------------------+----------------+-----------+-------------+-----------+----+-----------------+--------------------+--------------------+-----------+\n",
+            "|marketplace|customer_id|     review_id|product_id|product_parent|       product_title|product_category|star_rating|helpful_votes|total_votes|vine|verified_purchase|     review_headline|         review_body|review_date|\n",
+            "+-----------+-----------+--------------+----------+--------------+--------------------+----------------+-----------+-------------+-----------+----+-----------------+--------------------+--------------------+-----------+\n",
+            "|         US|   16414143|R3W4P9UBGNGH1U|B00YL0EKWE|     852431543|LG G4 Case Hard T...|        Wireless|          2|            1|          3|   N|                Y|Looks good, funct...|2 issues  -  Once...| 2015-08-31|\n",
+            "|         US|   50800750|R15V54KBMTQWAY|B00XK95RPQ|     516894650|Selfie Stick Fibl...|        Wireless|          4|            0|          0|   N|                N| A fun little gadget|I’m embarrassed t...| 2015-08-31|\n",
+            "|         US|   15184378| RY8I449HNXSVF|B00SXRXUKO|     984297154|Tribe AB40 Water ...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|  Fits iPhone 6 well| 2015-08-31|\n",
+            "|         US|   10203548|R18TLJYCKJFLSR|B009V5X1CE|     279912704|RAVPower® Element...|        Wireless|          5|            0|          0|   N|                Y|       Great charger|Great charger.  I...| 2015-08-31|\n",
+            "|         US|     488280|R1NK26SWS53B8Q|B00D93OVF0|     662791300|Fosmon Micro USB ...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|Great for the pri...| 2015-08-31|\n",
+            "|         US|   13334021|R11LOHEDYJALTN|B00XVGJMDQ|     421688488|iPhone 6 Case, Vo...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|Great Case, bette...| 2015-08-31|\n",
+            "|         US|   27520697|R3ALQVQB2P9LA7|B00KQW1X1C|     554285554|Nokia Lumia 630 R...|        Wireless|          4|            0|          0|   N|                Y|          Four Stars|Easy to set up an...| 2015-08-31|\n",
+            "|         US|   48086021|R3MWLXLNO21PDQ|B00IP1MQNK|     488006702|Lumsing 10400mah ...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|         Works great| 2015-08-31|\n",
+            "|         US|   12738196|R2L15IS24CX0LI|B00HVORET8|     389677711|iPhone 5S Battery...|        Wireless|          5|            0|          0|   N|                Y|      So far so good|So far so good. I...| 2015-08-31|\n",
+            "|         US|   15867807|R1DJ8976WPWVZU|B00HX3G6J6|     299654876|HTC One M8 Screen...|        Wireless|          3|            0|          0|   N|                Y|seems durable but...|seems durable but...| 2015-08-31|\n",
+            "|         US|    1972249|R3MRWNNR8CBTB7|B00U4NATNQ|     577878727|S6 Case - Bear Mo...|        Wireless|          5|            0|          0|   N|                Y|Super thin, light...|Super thin, light...| 2015-08-31|\n",
+            "|         US|   10956619|R1DS6DKTUXAQK3|B00SZEFDH8|     654620704|BLU Studio X, Unl...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|As good as the Sa...| 2015-08-31|\n",
+            "|         US|   14805911| RWJM5E0TWUJD2|B00JRJUL9U|     391166958|EZOPower 5-Port U...|        Wireless|          5|            0|          0|   N|                Y|            EZOPower|I received this o...| 2015-08-31|\n",
+            "|         US|   15611116|R1XTJKDYNCRGAC|B00KQ4T0HE|     481551630|iPhone 6S Case &i...|        Wireless|          1|            0|          0|   N|                Y|Very cheap case. ...|Very cheap case. ...| 2015-08-31|\n",
+            "|         US|   39298603|R2UZL3DPWEU1XW|B00M0YWKPM|     685107474| iPhone 6s Plus Case|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|       son loves it.| 2015-08-31|\n",
+            "|         US|   17552454|R2EZXET9KBFFU3|B00KDZEE68|     148320945|zBoost ZB575-A TR...|        Wireless|          1|            0|          0|   N|                Y|            One Star|you have to turn ...| 2015-08-31|\n",
+            "|         US|   12218556|R26VY1L1FD3LPU|B00BJN45GM|      47788188|OtterBox Defender...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|  Awesome, thank you| 2015-08-31|\n",
+            "|         US|   21872923|R2SSA4NSFCV18T|B00SA86SXW|     748759272|Aduro PowerUP 30W...|        Wireless|          5|            0|          0|   N|                N|          Five Stars|         nice, smart| 2015-08-31|\n",
+            "|         US|   16264332|R1G6333JHJNEUQ|B00Q3I68TU|     974085141|LilGadgets Connec...|        Wireless|          5|            0|          0|   N|                Y|Great headphones ...|We love these hea...| 2015-08-31|\n",
+            "|         US|    6042304|R2DRG0UZXJQ0PE|B00TN4J1TA|     716174627|Anker Aluminum Mu...|        Wireless|          5|            0|          0|   N|                Y|          Five Stars|This is well wort...| 2015-08-31|\n",
+            "+-----------+-----------+--------------+----------+--------------+--------------------+----------------+-----------+-------------+-----------+----+-----------------+--------------------+--------------------+-----------+\n",
+            "only showing top 20 rows\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Print our schema\n",
+        "df.printSchema()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "97kXmxm0MDs8",
+        "outputId": "66b13e81-a493-452c-eb77-568f21b6b8fc"
+      },
+      "execution_count": 6,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "root\n",
+            " |-- marketplace: string (nullable = true)\n",
+            " |-- customer_id: string (nullable = true)\n",
+            " |-- review_id: string (nullable = true)\n",
+            " |-- product_id: string (nullable = true)\n",
+            " |-- product_parent: string (nullable = true)\n",
+            " |-- product_title: string (nullable = true)\n",
+            " |-- product_category: string (nullable = true)\n",
+            " |-- star_rating: string (nullable = true)\n",
+            " |-- helpful_votes: string (nullable = true)\n",
+            " |-- total_votes: string (nullable = true)\n",
+            " |-- vine: string (nullable = true)\n",
+            " |-- verified_purchase: string (nullable = true)\n",
+            " |-- review_headline: string (nullable = true)\n",
+            " |-- review_body: string (nullable = true)\n",
+            " |-- review_date: string (nullable = true)\n",
+            "\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Show the columns\n",
+        "df.columns"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "vpxgrFOfMGh1",
+        "outputId": "f6202a40-07b4-44c4-c02b-d4f74a2fbac1"
+      },
+      "execution_count": 7,
+      "outputs": [
+        {
+          "output_type": "execute_result",
+          "data": {
+            "text/plain": [
+              "['marketplace',\n",
+              " 'customer_id',\n",
+              " 'review_id',\n",
+              " 'product_id',\n",
+              " 'product_parent',\n",
+              " 'product_title',\n",
+              " 'product_category',\n",
+              " 'star_rating',\n",
+              " 'helpful_votes',\n",
+              " 'total_votes',\n",
+              " 'vine',\n",
+              " 'verified_purchase',\n",
+              " 'review_headline',\n",
+              " 'review_body',\n",
+              " 'review_date']"
+            ]
+          },
+          "metadata": {},
+          "execution_count": 7
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.count()"
+      ],
+      "metadata": {
+        "id": "Z7eRCsdeU5Na"
+      },
+      "execution_count": null,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# Describe our data\n",
+        "df.describe()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 328
+        },
+        "id": "L9wLJ11rMIwN",
+        "outputId": "b7ba1cae-a732-45f0-9b09-9b97878f23db"
+      },
+      "execution_count": 12,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "KeyboardInterrupt",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mKeyboardInterrupt\u001b[0m                         Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-12-7d80a4dfe728>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[0;31m# Describe our data\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 2\u001b[0;31m \u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdescribe\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m/content/spark-3.2.0-bin-hadoop2.7/python/pyspark/sql/dataframe.py\u001b[0m in \u001b[0;36mdescribe\u001b[0;34m(self, *cols)\u001b[0m\n\u001b[1;32m   1505\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcols\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m==\u001b[0m \u001b[0;36m1\u001b[0m \u001b[0;32mand\u001b[0m \u001b[0misinstance\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcols\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlist\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1506\u001b[0m             \u001b[0mcols\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mcols\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;36m0\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1507\u001b[0;31m         \u001b[0mjdf\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdescribe\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jseq\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcols\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1508\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mDataFrame\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mjdf\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msql_ctx\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1509\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/content/spark-3.2.0-bin-hadoop2.7/python/lib/py4j-0.10.9.2-src.zip/py4j/java_gateway.py\u001b[0m in \u001b[0;36m__call__\u001b[0;34m(self, *args)\u001b[0m\n\u001b[1;32m   1306\u001b[0m             \u001b[0mproto\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mEND_COMMAND_PART\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1307\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1308\u001b[0;31m         \u001b[0manswer\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgateway_client\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_command\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcommand\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1309\u001b[0m         return_value = get_return_value(\n\u001b[1;32m   1310\u001b[0m             answer, self.gateway_client, self.target_id, self.name)\n",
+            "\u001b[0;32m/content/spark-3.2.0-bin-hadoop2.7/python/lib/py4j-0.10.9.2-src.zip/py4j/java_gateway.py\u001b[0m in \u001b[0;36msend_command\u001b[0;34m(self, command, retry, binary)\u001b[0m\n\u001b[1;32m   1036\u001b[0m         \u001b[0mconnection\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_get_connection\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1037\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m-> 1038\u001b[0;31m             \u001b[0mresponse\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mconnection\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0msend_command\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcommand\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m   1039\u001b[0m             \u001b[0;32mif\u001b[0m \u001b[0mbinary\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1040\u001b[0m                 \u001b[0;32mreturn\u001b[0m \u001b[0mresponse\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_create_connection_guard\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mconnection\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/content/spark-3.2.0-bin-hadoop2.7/python/lib/py4j-0.10.9.2-src.zip/py4j/clientserver.py\u001b[0m in \u001b[0;36msend_command\u001b[0;34m(self, command)\u001b[0m\n\u001b[1;32m    473\u001b[0m         \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    474\u001b[0m             \u001b[0;32mwhile\u001b[0m \u001b[0;32mTrue\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 475\u001b[0;31m                 \u001b[0manswer\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0msmart_decode\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstream\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mreadline\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m-\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    476\u001b[0m                 \u001b[0mlogger\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdebug\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"Answer received: {0}\"\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mformat\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0manswer\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    477\u001b[0m                 \u001b[0;31m# Happens when a the other end is dead. There might be an empty\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;32m/usr/lib/python3.7/socket.py\u001b[0m in \u001b[0;36mreadinto\u001b[0;34m(self, b)\u001b[0m\n\u001b[1;32m    587\u001b[0m         \u001b[0;32mwhile\u001b[0m \u001b[0;32mTrue\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    588\u001b[0m             \u001b[0;32mtry\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 589\u001b[0;31m                 \u001b[0;32mreturn\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_sock\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mrecv_into\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mb\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    590\u001b[0m             \u001b[0;32mexcept\u001b[0m \u001b[0mtimeout\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    591\u001b[0m                 \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_timeout_occurred\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;32mTrue\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mKeyboardInterrupt\u001b[0m: "
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.info()"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 287
+        },
+        "id": "1VdiaijUKw2f",
+        "outputId": "dc87cbe0-fb03-4141-c539-f8ae62baf44f"
+      },
+      "execution_count": 11,
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "AttributeError",
+          "evalue": "ignored",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+            "\u001b[0;32m<ipython-input-11-a74c58233b9e>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0mdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0minfo\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m",
+            "\u001b[0;32m/content/spark-3.2.0-bin-hadoop2.7/python/pyspark/sql/dataframe.py\u001b[0m in \u001b[0;36m__getattr__\u001b[0;34m(self, name)\u001b[0m\n\u001b[1;32m   1658\u001b[0m         \u001b[0;32mif\u001b[0m \u001b[0mname\u001b[0m \u001b[0;32mnot\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mcolumns\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1659\u001b[0m             raise AttributeError(\n\u001b[0;32m-> 1660\u001b[0;31m                 \"'%s' object has no attribute '%s'\" % (self.__class__.__name__, name))\n\u001b[0m\u001b[1;32m   1661\u001b[0m         \u001b[0mjc\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mself\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0m_jdf\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mapply\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mname\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m   1662\u001b[0m         \u001b[0;32mreturn\u001b[0m \u001b[0mColumn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mjc\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+            "\u001b[0;31mAttributeError\u001b[0m: 'DataFrame' object has no attribute 'info'"
+          ]
+        }
+      ]
+    }
+  ]
+}
