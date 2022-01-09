@@ -22,4 +22,4 @@ The next step was to compare the average of ratings for verified purchases to th
 
 For both the Software and Video Game product categories, it was found that the Vine program ratings were higher than the average of the verified purchase review ratings.  
 
-This suggests that there is bias in the Amazon Vine program. It could be that receiving a product for free and reviewing it skews the judgment of the reviewer to choose a higher rating than for a reviewer who paid money to buy the product.
+This suggests that there is bias in the Amazon Vine program. It could be that receiving a product for free and reviewing it skews the judgment of the reviewer to choose a higher rating than for a reviewer who bought the product.
